@@ -39,22 +39,18 @@ from urllib.parse import urlencode
 
 @app.get("/login")
 def login():
-    state = secrets.token_urlsafe(16)
-
     params = {
         "response_type": "code",
         "client_id": CLIENT_ID,
         "redirect_uri": REDIRECT_URI,
         "scope": "daily personal heartrate",
-        "state": state,
+        "state": "testing123",
     }
 
-    url = (
-        "https://cloud.ouraring.com/oauth/authorize?"
+    return {
+        "url": "https://cloud.ouraring.com/oauth/authorize?"
         + urlencode(params)
-    )
-
-    return RedirectResponse(url)
+    }
     
 
 @app.get("/oauth/callback")
