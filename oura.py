@@ -1,7 +1,7 @@
 import requests
 
-from .config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
-from .storage import load_tokens, save_tokens
+from config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
+from storage import load_tokens, save_tokens
 
 TOKEN_URL = "https://api.ouraring.com/oauth/token"
 API_BASE = "https://api.ouraring.com/v2/usercollection"

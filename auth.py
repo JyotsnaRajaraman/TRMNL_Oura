@@ -4,8 +4,8 @@ from urllib.parse import urlencode
 import secrets
 import requests
 
-from .config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
-from .storage import save_tokens
+from config import CLIENT_ID, CLIENT_SECRET, REDIRECT_URI
+from storage import save_tokens
 
 router = APIRouter()
 
