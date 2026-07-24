@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from app.auth import router as auth_router
-from app.oura import (
+from auth import router as auth_router
+from oura import (
     get_daily_sleep,
     get_daily_activity,
     get_daily_readiness,
