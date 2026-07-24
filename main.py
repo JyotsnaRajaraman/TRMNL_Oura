@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
+from urllib.parse import urlencode
 import os
 import secrets
 
 app = FastAPI()
 
+# Environment variables from Railway
 CLIENT_ID = os.environ["OURA_CLIENT_ID"]
 REDIRECT_URI = os.environ["OURA_REDIRECT_URI"]
 
@@ -14,49 +16,52 @@ def home():
     return {"status": "running"}
 
 
-# @app.get("/login")
-# def login():
-#     state = secrets.token_urlsafe(16)
-
-#     scopes = [
-#         "daily",
-#         "heartrate",
-#         "personal",
-#     ]
-
-#     url = (
-#         "https://cloud.ouraring.com/oauth/authorize?"
-#         f"response_type=code"
-#         f"&client_id={CLIENT_ID}"
-#         f"&redirect_uri={REDIRECT_URI}"
-#         f"&scope={' '.join(scopes)}"
-#         f"&state={state}"
-#     )
-
-#     return RedirectResponse(url)
-
-from urllib.parse import urlencode
-
 @app.get("/login")
 def login():
+    state = secrets.token_urlsafe(16)
+
+    # Request every scope your app has been approved for
+    scopes = [
+        "email",
+        "heartrate",
+        "stress",
+        "session",
+        "personal",
+        "tag",
+        "spo2",
+        "heart_health",
+        "daily",
+        "workout",
+    ]
+
     params = {
-        "response_type": "code",
         "client_id": CLIENT_ID,
         "redirect_uri": REDIRECT_URI,
-        "scope": "daily personal heartrate",
-        "state": "testing123",
+        "response_type": "code",
+        "scope": " ".join(scopes),
+        "state": state,
     }
 
-    return {
-        "url": "https://cloud.ouraring.com/oauth/authorize?"
+    auth_url = (
+        "https://cloud.ouraring.com/oauth/authorize?"
         + urlencode(params)
-    }
-    
+    )
+
+    print(auth_url)
+
+    return RedirectResponse(auth_url)
+
 
 @app.get("/oauth/callback")
-def callback(code: str, state: str = ""):
+def callback(
+    code: str | None = None,
+    state: str | None = None,
+    error: str | None = None,
+    error_description: str | None = None,
+):
     return {
-        "success": True,
-        "authorization_code": code,
+        "code": code,
         "state": state,
+        "error": error,
+        "error_description": error_description,
     }
