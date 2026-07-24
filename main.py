@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from urllib.parse import urlencode
 import os
+import requests
 import secrets
 
 app = FastAPI()
@@ -9,6 +10,7 @@ app = FastAPI()
 # Environment variables from Railway
 CLIENT_ID = os.environ["OURA_CLIENT_ID"]
 REDIRECT_URI = os.environ["OURA_REDIRECT_URI"]
+CLIENT_SECRET = os.environ["OURA_CLIENT_SECRET"]
 
 
 @app.get("/")
@@ -52,6 +54,7 @@ def login():
     return RedirectResponse(auth_url)
 
 
+
 @app.get("/oauth/callback")
 def callback(
     code: str | None = None,
@@ -59,9 +62,21 @@ def callback(
     error: str | None = None,
     error_description: str | None = None,
 ):
-    return {
-        "code": code,
-        "state": state,
-        "error": error,
-        "error_description": error_description,
-    }
+    if error:
+        return {
+            "error": error,
+            "description": error_description,
+        }
+
+    token_response = requests.post(
+        "https://api.ouraring.com/oauth/token",
+        data={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": REDIRECT_URI,
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+        },
+    )
+
+    return token_response.json()
